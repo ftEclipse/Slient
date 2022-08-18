@@ -1,5 +1,12 @@
--- Eclipse's Legit Slient 
-
+ --[[
+Firework WWWWWWWW
+██████  ███████  ██     ██  ██████████    ████████    ███████
+██      ██       ██         ██      ██  ██            ██
+████    ██       ██     ██  ██████████    ███████     ██████
+██      ██       ██     ██  ██                   ██   ██
+██████  ███████  █████  ██  ██            ████████    ███████
+   Eclipse's Legit Slient
+]]
 if getgenv().Aiming then return getgenv().Aiming end
 
 -- // game Services
@@ -42,7 +49,7 @@ getgenv().Aiming = {
     ShowFOV = false,
     FOV = 17.6,
     FOVSides = 300,
-    FOVColour = Color3fromRGB(255, 0, 0),
+    FOVColour = Color3fromRGB(255, 255, 255),
 
     VisibleCheck = true,
     
