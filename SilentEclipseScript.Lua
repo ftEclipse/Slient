@@ -46,8 +46,8 @@ local tableinsert = table.insert
 getgenv().Aiming = {
     Enabled = true,
 
-    ShowFOV = true,
-    FOV = 19.7,
+    ShowFOV = false,
+    FOV = 20,
     FOVSides = 300,
     FOVColour = Color3fromRGB(255, 255, 255),
 
@@ -77,7 +77,7 @@ local Aiming = getgenv().Aiming
 
 -- // Create circle
 local circle = Drawingnew("Circle")
-circle.Transparency = 0
+circle.Transparency = 1
 circle.Thickness = 1.5
 circle.Color = Aiming.FOVColour
 circle.Filled = false
