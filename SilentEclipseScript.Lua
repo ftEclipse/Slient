@@ -1,5 +1,4 @@
  --[[
-Firework WWWWWWWW
 ██████  ███████  ██     ██  ██████████    ████████    ███████
 ██      ██       ██         ██      ██  ██            ██
 ████    ██       ██     ██  ██████████    ███████     ██████
@@ -58,7 +57,7 @@ getgenv().Aiming = {
     Selected = nil,
     SelectedPart = nil,
 
-    TargetPart = {"Head", "UpperTorso", "LowerTorso", "HumanoidRootPart", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand"},
+    TargetPart = {"Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand"},
 
     Ignored = {
         Teams = {
