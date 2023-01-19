@@ -1,16 +1,5 @@
---[[
- . -.-. .-.. .. .--. ... .
-██████  ███████  ██     ██  ██████████    ████████    ███████
-██      ██       ██         ██      ██  ██            ██
-████    ██       ██     ██  ██████████    ███████     ██████
-██      ██       ██     ██  ██                   ██   ██
-██████  ███████  █████  ██  ██           █████████    ███████
-
-   Eclipse's Legit Slient
-]]
-
 if getgenv().fwSilent then
-return getgenv().fwSilent
+	return getgenv().fwSilent
 end
 
 local Players = game:GetService("Players")
@@ -25,12 +14,14 @@ local Mouse = LocalPlayer:GetMouse()
 
 getgenv().fwSilent = {
 	SilentAimEnabled = true,
-	ShowFOV = false,
+	ShowFOV = true,
 	VisibleCheck = true,
 	TeamCheck = false,
 	FOV = 25,
+	FOVSides = 700,
 	HitChance = 195,
-	Selected = LocalPlayer,
+	FOVColour = Color3.fromRGB(255, 255, 255),
+	Selected = nil,
 	TargetPart = "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand",
 	BlacklistedTeams = {
 		{
@@ -43,20 +34,23 @@ getgenv().fwSilent = {
 }
 
 local circle = Drawing.new("Circle")
-circle.Transparency = 0
-circle.Thickness = 2
-circle.Color = Color3.fromRGB(255, 255, 255)
-circle.NumSides = 12
+circle.Transparency = 1
+circle.Thickness = 1.7
+circle.Color = fwSilent.FOVColour
 circle.Filled = false
 
 function fwSilent.updateCircle()
-	if (circle) then
-		circle.Visible = fwSilent.ShowFOV
-		circle.Radius = (fwSilent.FOV * 3)
-		circle.Position = Vector2.new(Mouse.X, Mouse.Y + GuiService:GetGuiInset().Y)
-		
-		return circle
+	if not (circle) then
+		return
 	end
+	
+	circle.Visible = fwSilent.ShowFOV
+	circle.Radius = (fwSilent.FOV * 3)
+	circle.Position = Vector2.new(Mouse.X, Mouse.Y + GuiService:GetGuiInset().Y)
+	circle.NumSides = fwSilent.FOVSides
+	circle.Color = fwSilent.FOVColour
+	
+	return circle
 end
 
 calcChance = function(percentage)
@@ -150,7 +144,7 @@ function fwSilent.checkHealth(Player)
 end
 
 function fwSilent.checkSilentAim()
-	return (fwSilent.SilentAimEnabled == true and fwSilent.Selected ~= LocalPlayer)
+	return (fwSilent.SilentAimEnabled == true and fwSilent.Selected ~= nil)
 end
 
 function fwSilent.getClosestPlayerToCursor()
@@ -186,7 +180,7 @@ function fwSilent.getClosestPlayerToCursor()
 			end
 		end
 	end
-	fwSilent.Selected = (Chance and ClosestPlayer or LocalPlayer)
+	fwSilent.Selected = (Chance and ClosestPlayer or nil)
 end
 
 Heartbeat:Connect(function()
