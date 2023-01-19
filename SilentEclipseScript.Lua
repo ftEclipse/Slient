@@ -21,7 +21,7 @@ getgenv().fwSilent = {
 	FOVSides = 700,
 	HitChance = 195,
 	FOVColour = Color3.fromRGB(255, 255, 255),
-	Selected = nil,
+	Selected = LocalPlayer,
 	TargetPart = "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand",
 	BlacklistedTeams = {
 		{
@@ -180,7 +180,7 @@ function fwSilent.getClosestPlayerToCursor()
 			end
 		end
 	end
-	fwSilent.Selected = (Chance and ClosestPlayer or nil)
+	fwSilent.Selected = (Chance and ClosestPlayer or LocalPlayer)
 end
 
 Heartbeat:Connect(function()
