@@ -25,7 +25,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 getgenv().fwSilent = {
 	SilentAimEnabled = true,
-	ShowFOV = true,
+	ShowFOV = false,
 	VisibleCheck = true,
 	TeamCheck = false,
 	FOV = 25,
