@@ -18,9 +18,7 @@ getgenv().fwSilent = {
 	VisibleCheck = true,
 	TeamCheck = false,
 	FOV = 25,
-	FOVSides = 700,
-	HitChance = 195,
-	FOVColour = Color3.fromRGB(255, 255, 255),
+	HitChance = 380,
 	Selected = LocalPlayer,
 	TargetPart = "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand",
 	BlacklistedTeams = {
@@ -35,20 +33,21 @@ getgenv().fwSilent = {
 
 local circle = Drawing.new("Circle")
 circle.Transparency = 1
-circle.Thickness = 1.7
-circle.Color = fwSilent.FOVColour
+circle.Thickness = 2
+circle.Color = Color3.fromRGB(255, 255, 255)
+circle.NumSides = 700
 circle.Filled = false
 
 function fwSilent.updateCircle()
 	if not (circle) then
 		return
 	end
-	
 	circle.Visible = fwSilent.ShowFOV
 	circle.Radius = (fwSilent.FOV * 3)
+	circle.Color = Color3.fromRGB(255, 255, 255)
+	circle.NumSides = 700
 	circle.Position = Vector2.new(Mouse.X, Mouse.Y + GuiService:GetGuiInset().Y)
-	circle.NumSides = fwSilent.FOVSides
-	circle.Color = fwSilent.FOVColour
+	circle.Filled = false
 	
 	return circle
 end
