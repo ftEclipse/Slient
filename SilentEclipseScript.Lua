@@ -144,7 +144,7 @@ function fwSilent.checkHealth(Player)
 end
 
 function fwSilent.checkSilentAim()
-	return (fwSilent.SilentAimEnabled == true and fwSilent.Selected ~= nil)
+	return (fwSilent.SilentAimEnabled == true and fwSilent.Selected ~= LocalPlayer)
 end
 
 function fwSilent.getClosestPlayerToCursor()
