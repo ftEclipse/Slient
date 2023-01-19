@@ -40,8 +40,8 @@ circle.Filled = false
 
 function fwSilent.updateCircle()
 	if not (circle) then
-		return
-	end
+		return	
+	else
 	circle.Visible = fwSilent.ShowFOV
 	circle.Radius = (fwSilent.FOV * 3)
 	circle.Color = Color3.fromRGB(255, 255, 255)
@@ -50,6 +50,7 @@ function fwSilent.updateCircle()
 	circle.Filled = false
 	
 	return circle
+	end
 end
 
 calcChance = function(percentage)
