@@ -149,11 +149,13 @@ end
 
 function fwSilent.getClosestPlayerToCursor()
 	local ClosestPlayer = nil
+	local TargetPart = nil
 	local Chance = calcChance(fwSilent.HitChance)
 	local ShortestDistance = 1/0
 
 	if (not Chance) then
 		fwSilent.Selected = (Chance and LocalPlayer or LocalPlayer)
+		fwEclipse.TargetPart = nil
 		return (Chance and LocalPlayer or LocalPlayer)
 	end
 	
@@ -166,8 +168,9 @@ function fwSilent.getClosestPlayerToCursor()
 			if (fwSilent.TeamCheck and not fwSilent.checkTeam(Player, LocalPlayer)) then 
 				continue
 			end
-
-			local TargetPart = Character[fwSilent.TargetPart]
+			local TargetPartTemp, _, _, Magnitude = fwSilent.GetClosestTargetPartToCursor(Character)
+			
+			TargetPart = Character[fwSilent.TargetPart]
 			local PartPos, _ = CurrentCamera:WorldToViewportPoint(TargetPart.Position)
 			local Magnitude = (Vector2.new(PartPos.X, PartPos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
 
@@ -175,6 +178,7 @@ function fwSilent.getClosestPlayerToCursor()
 				if (fwSilent.VisibleCheck and not fwSilent.isPartVisible(TargetPart, Character)) then
 					continue
 				end
+				TargetPart = Character[fwSilent.TargetPart]
 				ClosestPlayer = Player
 				ShortestDistance = Magnitude
 			end
