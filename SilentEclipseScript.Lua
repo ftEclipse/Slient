@@ -20,7 +20,7 @@ getgenv().fwSilent = {
 	FOV = 25,
 	HitChance = 380,
 	Selected = LocalPlayer,
-	TargetPart = "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand"
+	TargetPart = "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand",
 	BlacklistedTeams = {
 		{
 			Team = LocalPlayer.Team,
@@ -32,8 +32,8 @@ getgenv().fwSilent = {
 }
 
 local circle = Drawing.new("Circle")
-circle.Transparency = 1
-circle.Thickness = 2
+circle.Transparency = 0.4
+circle.Thickness = 0.8
 circle.Color = Color3.fromRGB(255, 255, 255)
 circle.NumSides = 700
 circle.Filled = false
