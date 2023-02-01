@@ -227,7 +227,7 @@ function FwSilent.CheckHealth(Player)
 end
 
 function FwSilent.Check()
-	return (FwSilent.Enabled == true and FwSilent.Selected ~= LocalPlayer and FwSilent.SelectedPart ~= nil)
+	return (FwSilent.SilentAimEnabled == true and FwSilent.Selected ~= LocalPlayer and FwSilent.SelectedPart ~= nil)
 end
 
 FwSilent.checkSilentAim = FwSilent.Check
