@@ -166,7 +166,7 @@ function fwSilent.getClosestPlayerToCursor()
 			if (fwSilent.TeamCheck and not fwSilent.checkTeam(Player, LocalPlayer)) then 
 				continue
 			end
-			local TargetPartTemp, _, _, Magnitude = fwSilent.GetClosestTargetPartToCursor(Character)
+			
 			
 			TargetPart = Character[fwSilent.TargetPart]
 			local PartPos, _ = CurrentCamera:WorldToViewportPoint(TargetPart.Position)
