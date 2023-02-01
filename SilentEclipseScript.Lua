@@ -14,6 +14,7 @@ local Mouse = LocalPlayer:GetMouse()
 local CharacterAdded = LocalPlayer.CharacterAdded
 local CharacterAddedWait = CharacterAdded.Wait
 
+local EnumRaycastFilterTypeBlacklist = Enum.RaycastFilterType.Blacklist
 local FindFirstChildWhichIsA = Instance.new("Part").FindFirstChildWhichIsA
 local IsDescendantOf = Instance.new("Part").IsDescendantOf
 local FindFirstChild = Instance.new("Part").FindFirstChild
@@ -86,7 +87,7 @@ function FwSilent.IsPartVisible(Part, PartDescendant)
 
 	if (OnScreen) then
 		local raycastParams = RaycastParams.new()
-		raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+		raycastParams.FilterType = EnumRaycastFilterTypeBlacklist
 		raycastParams.FilterDescendantsInstances = {Character, CurrentCamera}
 
 		local Result = Workspace.Raycast(Workspace, Origin, Part.Position - Origin, raycastParams)
