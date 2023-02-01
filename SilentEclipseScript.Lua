@@ -11,10 +11,10 @@ local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = Workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
+local GetPlayers = Players.GetPlayers
 local CharacterAdded = LocalPlayer.CharacterAdded
 local CharacterAddedWait = CharacterAdded.Wait
 
-local EnumRaycastFilterTypeBlacklist = Enum.RaycastFilterType.Blacklist
 local FindFirstChildWhichIsA = Instance.new("Part").FindFirstChildWhichIsA
 local IsDescendantOf = Instance.new("Part").IsDescendantOf
 local FindFirstChild = Instance.new("Part").FindFirstChild
@@ -87,7 +87,7 @@ function FwSilent.IsPartVisible(Part, PartDescendant)
 
 	if (OnScreen) then
 		local raycastParams = RaycastParams.new()
-		raycastParams.FilterType = EnumRaycastFilterTypeBlacklist
+		raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 		raycastParams.FilterDescendantsInstances = {Character, CurrentCamera}
 
 		local Result = Workspace.Raycast(Workspace, Origin, Part.Position - Origin, raycastParams)
@@ -298,7 +298,7 @@ function FwSilent.GetClosestPlayerToCursor()
 		return LocalPlayer
 	end
 
-	for _, Player in ipairs(Players.GetPlayers(Players)) do
+	for _, Player in ipairs(GetPlayers(Players)) do
 		local Character = FwSilent.Character(Player)
 		
 		if (FwSilent.IsIgnored(Player) == false and Character) then
