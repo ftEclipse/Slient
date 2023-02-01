@@ -1,5 +1,5 @@
-if getgenv().fwSilent then
-	return getgenv().fwSilent
+if getgenv().FwSilent then
+	return getgenv().FwSilent 
 end
 
 local Players = game:GetService("Players")
@@ -7,186 +7,324 @@ local Workspace = game:GetService("Workspace")
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 
-local Heartbeat = RunService.Heartbeat
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = Workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
-getgenv().fwSilent = {
+local CharacterAdded = LocalPlayer.CharacterAdded
+local CharacterAddedWait = CharacterAdded.Wait
+
+local FindFirstChildWhichIsA = Instance.new("Part").FindFirstChildWhichIsA
+local IsDescendantOf = Instance.new("Part").IsDescendantOf
+local FindFirstChild = Instance.new("Part").FindFirstChild
+
+getgenv().FwSilent = {
 	SilentAimEnabled = true,
-	ShowFOV = true,
+
+	ShowFOV = false,
+	FOV = 17,
+	FOVSides = 700,
+	FOVColour = Color3.fromRGB(255, 255, 255),
+
 	VisibleCheck = true,
-	TeamCheck = false,
-	FOV = 25,
-	HitChance = 380,
-	Selected = LocalPlayer,
+
+	HitChance = 125,
+
+	Selected = nil,
+	SelectedPart = nil,
+
 	TargetPart = {"Head", "HumanoidRootPart", "UpperTorso", "LowerTorso", "RightFoot", "LeftFoot", "RightLeg", "RightLowerLeg", "RightUpperArm", "LeftUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftLeg", "LeftLowerLeg", "LeftArm", "RightArm", "RightLowerArm","LeftLowerArm", "LeftHand", "RightHand"},
-	BlacklistedTeams = {
-		{
-			Team = LocalPlayer.Team,
-			TeamColor = LocalPlayer.TeamColor,
+
+	Ignored = {
+		Teams = {
+			{
+				Team = LocalPlayer.Team,
+				TeamColor = LocalPlayer.TeamColor,
+			},
 		},
-	},
-	BlacklistedPlayers = {LocalPlayer},
-	WhitelistedPUIDs = {},
+		Players = {
+			LocalPlayer,
+			3508651141
+		}
+	}
 }
+local FwSilent = getgenv().FwSilent
 
 local circle = Drawing.new("Circle")
 circle.Transparency = 0.4
 circle.Thickness = 0.8
-circle.Color = Color3.fromRGB(255, 255, 255)
-circle.NumSides = 700
+circle.Color = FwSilent.FOVColour
 circle.Filled = false
+FwSilent.FOVCircle = circle
 
-function fwSilent.updateCircle()
+function FwSilent.UpdateFOV()
 	if not (circle) then
-		return	
-	else
-	circle.Visible = fwSilent.ShowFOV
-	circle.Radius = (fwSilent.FOV * 3)
-	circle.Color = Color3.fromRGB(255, 255, 255)
-	circle.NumSides = 700
-	circle.Position = Vector2.new(Mouse.X, Mouse.Y + GuiService:GetGuiInset().Y)
-	circle.Filled = false
-	
-	return circle
+		return
 	end
+
+	circle.Visible = FwSilent.ShowFOV
+	circle.Radius = (FwSilent.FOV * 3)
+	circle.Position = Vector2.new(Mouse.X, Mouse.Y + GuiService.GetGuiInset(GuiService).Y)
+	circle.NumSides = FwSilent.FOVSides
+	circle.Color = FwSilent.FOVColour
+
+	return circle
 end
 
-calcChance = function(percentage)
+local CalcChance = function(percentage)
 	percentage = math.floor(percentage)
+
 	local chance = math.floor(Random.new().NextNumber(Random.new(), 0, 1) * 100) / 100
-	return chance <= percentage/100
+
+	return chance <= percentage / 100
 end
 
-function fwSilent.isPartVisible(Part, PartDescendant)
-	local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+function FwSilent.IsPartVisible(Part, PartDescendant)
+	local Character = LocalPlayer.Character or CharacterAddedWait(CharacterAdded)
 	local Origin = CurrentCamera.CFrame.Position
-	local _, OnScreen = CurrentCamera:WorldToViewportPoint(Part.Position)
+	local _, OnScreen = CurrentCamera.WorldToViewportPoint(CurrentCamera, Part.Position)
 
 	if (OnScreen) then
 		local raycastParams = RaycastParams.new()
 		raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 		raycastParams.FilterDescendantsInstances = {Character, CurrentCamera}
 
-		local Result = Workspace:Raycast(Origin, Part.Position - Origin, raycastParams)
-		local PartHit = Result.Instance
-		local Visible = (not PartHit or PartHit:IsDescendantOf(PartDescendant))
-		
-		return Visible
-	end
-	return false
-end
+		local Result = Workspace.Raycast(Workspace, Origin, Part.Position - Origin, raycastParams)
 
-function fwSilent.checkTeam(targetPlayerA, targetPlayerB)
-	if (targetPlayerA.Team ~= targetPlayerB.Team) then
-		
-		for i = 1, #fwSilent.BlacklistedTeams do
-			local v = fwSilent.BlacklistedTeams
+		if (Result) then
+			local PartHit = Result.Instance
+			local Visible = (not PartHit or IsDescendantOf(PartHit, PartDescendant))
 
-			if (targetPlayerA.Team ~= v.Team and targetPlayerA.TeamColor ~= v.TeamColor) then
-				return true
-			end
+			return Visible
 		end
 	end
 	return false
 end
 
-function fwSilent.checkPlayer(targetPlayer)
-	for i = 1, #fwSilent.BlacklistedPlayers do
-		local v = fwSilent.BlacklistedPlayers[i]
+function FwSilent.IgnorePlayer(Player)
+	local Ignored = FwSilent.Ignored
+	local IgnoredPlayers = Ignored.Players
 
-		if (v ~= targetPlayer) then
+	for _, IgnoredPlayer in ipairs(IgnoredPlayers) do
+		if (IgnoredPlayer == Player) then
+			return false
+		end
+	end
+
+	table.insert(IgnoredPlayers, Player)
+	return true
+end
+
+function FwSilent.UnIgnorePlayer(Player)
+	local Ignored = FwSilent.Ignored
+	local IgnoredPlayers = Ignored.Players
+
+	for i, IgnoredPlayer in ipairs(IgnoredPlayers) do
+		if (IgnoredPlayer == Player) then
+			table.remove(IgnoredPlayers, i)
+			return true
+		end
+	end
+
+	return false
+end
+
+function FwSilent.IgnoreTeam(Team, TeamColor)
+	local Ignored = FwSilent.Ignored
+	local IgnoredTeams = Ignored.Teams
+
+	for _, IgnoredTeam in ipairs(IgnoredTeams) do
+		if (IgnoredTeam.Team == Team and IgnoredTeam.TeamColor == TeamColor) then
+			return false
+		end
+	end
+
+	table.insert(IgnoredTeams, {Team, TeamColor})
+	return true
+end
+
+function FwSilent.UnIgnoreTeam(Team, TeamColor)
+	local Ignored = FwSilent.Ignored
+	local IgnoredTeams = Ignored.Teams
+
+	for i, IgnoredTeam in ipairs(IgnoredTeams) do
+		if (IgnoredTeam.Team == Team and IgnoredTeam.TeamColor == TeamColor) then
+			table.remove(IgnoredTeams, i)
+			return true
+		end
+	end
+
+	return false
+end
+
+function FwSilent.TeamCheck(Toggle)
+	if (Toggle) then
+		return FwSilent.IgnoreTeam(LocalPlayer.Team, LocalPlayer.TeamColor)
+	end
+
+	return FwSilent.UnIgnoreTeam(LocalPlayer.Team, LocalPlayer.TeamColor)
+end
+
+function FwSilent.IsIgnoredTeam(Player)
+	local Ignored = FwSilent.Ignored
+	local IgnoredTeams = Ignored.Teams
+
+	for _, IgnoredTeam in ipairs(IgnoredTeams) do
+		if (Player.Team == IgnoredTeam.Team and Player.TeamColor == IgnoredTeam.TeamColor) then
 			return true
 		end
 	end
 	return false
 end
 
-function fwSilent.checkWhitelisted(targetPlayer)
-	for i = 1, #fwSilent.WhitelistedPUIDs do
-		local v = fwSilent.WhitelistedPUIDs[i]
+function FwSilent.IsIgnored(Player)
+	local Ignored = FwSilent.Ignored
+	local IgnoredPlayers = Ignored.Players
 
-		if (targetPlayer.UserId == v) then
+	for _, IgnoredPlayer in ipairs(IgnoredPlayers) do
+		if (typeof(IgnoredPlayer) == "number" and Player.UserId == IgnoredPlayer) then
+			return true
+		end
+
+		if (IgnoredPlayer == Player) then
 			return true
 		end
 	end
-	return false
+	return FwSilent.IsIgnoredTeam(Player)
 end
 
-function fwSilent.findDirectionNormalMaterial(Origin, Destination, UnitMultiplier)
+function FwSilent.Raycast(Origin, Destination, UnitMultiplier)
 	if (typeof(Origin) == "Vector3" and typeof(Destination) == "Vector3") then
-		if (not UnitMultiplier) then 
-			UnitMultiplier = 1
+		if (not UnitMultiplier) then
+			UnitMultiplier = 1 
 		end
+		
 		local Direction = (Destination - Origin).Unit * UnitMultiplier
-		local RaycastResult = Workspace:Raycast(Origin, Direction)
+		local Result = Workspace.Raycast(Workspace, Origin, Direction)
 
-		if (RaycastResult ~= nil) then
-			local Normal = RaycastResult.Normal
-			local Material = RaycastResult.Material
+		if (Result) then
+			local Normal = Result.Normal
+			local Material = Result.Material
+
 			return Direction, Normal, Material
 		end
 	end
 	return nil
 end
 
-function fwSilent.getCharacter(Player)
+function FwSilent.Character(Player)
 	return Player.Character
 end
 
-function fwSilent.checkHealth(Player)
-	local Character = fwSilent.getCharacter(Player)
-	local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+function FwSilent.CheckHealth(Player)
+	local Character = FwSilent.Character(Player)
+	local Humanoid = FindFirstChildWhichIsA(Character, "Humanoid")
 
 	local Health = (Humanoid and Humanoid.Health or 0)
+
 	return Health > 0
 end
 
-function fwSilent.checkSilentAim()
-	return (fwSilent.SilentAimEnabled == true and fwSilent.Selected ~= LocalPlayer)
+function FwSilent.Check()
+	return (FwSilent.Enabled == true and FwSilent.Selected ~= LocalPlayer and FwSilent.SelectedPart ~= nil)
 end
 
-function fwSilent.getClosestPlayerToCursor()
+FwSilent.checkSilentAim = FwSilent.Check
+
+function FwSilent.GetClosestTargetPartToCursor(Character)
+	local TargetParts = FwSilent.TargetPart
+	
+	local ClosestPart = nil
+	local ClosestPartPosition = nil
+	local ClosestPartOnScreen = false
+	local ClosestPartMagnitudeFromMouse = nil
+	local ShortestDistance = 1/0
+
+	local function CheckTargetPart(TargetPart)
+		if (typeof(TargetPart) == "string") then
+			TargetPart = FindFirstChild(Character, TargetPart)
+		end
+
+		if not (TargetPart) then
+			return
+		end
+
+		local PartPos, onScreen = CurrentCamera.WorldToViewportPoint(CurrentCamera, TargetPart.Position)
+		local GuiInset = GuiService.GetGuiInset(GuiService)
+		local Magnitude = (Vector2.new(PartPos.X, PartPos.Y - GuiInset.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+
+		if (Magnitude < ShortestDistance) then
+			ClosestPart = TargetPart
+			ClosestPartPosition = PartPos
+			ClosestPartOnScreen = onScreen
+			ClosestPartMagnitudeFromMouse = Magnitude
+			ShortestDistance = Magnitude
+		end
+	end
+
+	if (typeof(TargetParts) == "string") then
+		if (TargetParts == "All") then
+			for _, v in ipairs(Character:GetChildren()) do
+				if not (v:IsA("BasePart")) then
+					continue
+				end
+
+				CheckTargetPart(v)
+			end
+		else
+			CheckTargetPart(TargetParts)
+		end
+	end
+
+	if (typeof(TargetParts) == "table") then
+		for _, TargetPartName in ipairs(TargetParts) do
+			CheckTargetPart(TargetPartName)
+		end
+	end
+	return ClosestPart, ClosestPartPosition, ClosestPartOnScreen, ClosestPartMagnitudeFromMouse
+end
+
+function FwSilent.GetClosestPlayerToCursor()
+	local TargetPart = nil
 	local ClosestPlayer = nil
-	local Chance = calcChance(fwSilent.HitChance)
+	local Chance = CalcChance(FwSilent.HitChance)
 	local ShortestDistance = 1/0
 
 	if (not Chance) then
-		fwSilent.Selected = (Chance and LocalPlayer or LocalPlayer)
-		return (Chance and LocalPlayer or LocalPlayer)
+		FwSilent.Selected = LocalPlayer
+		FwSilent.SelectedPart = nil
+
+		return LocalPlayer
 	end
-	
-	local AllPlayers = Players:GetPlayers()
-	for i = 1, #AllPlayers do
-		local Player = AllPlayers[i]
-		local Character = fwSilent.getCharacter(Player)
 
-		if (not fwSilent.checkWhitelisted(Player) and fwSilent.checkPlayer(Player) and Character and Character:FindFirstChild(fwSilent.TargetPart) and fwSilent.checkHealth(Player)) then
-			if (fwSilent.TeamCheck and not fwSilent.checkTeam(Player, LocalPlayer)) then 
-				continue
-			end
+	for _, Player in ipairs(Players.GetPlayers(Players)) do
+		local Character = FwSilent.Character(Player)
+		
+		if (FwSilent.IsIgnored(Player) == false and Character) then
+			local TargetPartTemp, _, _, Magnitude = FwSilent.GetClosestTargetPartToCursor(Character)
 			
-			
-			TargetPart = Character[fwSilent.TargetPart]
-			local PartPos, _ = CurrentCamera:WorldToViewportPoint(TargetPart.Position)
-			local Magnitude = (Vector2.new(PartPos.X, PartPos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+			if (TargetPartTemp and FwSilent.CheckHealth(Player)) then
+				
+				if (circle.Radius > Magnitude and Magnitude < ShortestDistance) then
 
-			if (circle.Radius > Magnitude and Magnitude < ShortestDistance) then
-				if (fwSilent.VisibleCheck and not fwSilent.isPartVisible(TargetPart, Character)) then
-					continue
+					if (FwSilent.VisibleCheck and not FwSilent.IsPartVisible(TargetPartTemp, Character)) then
+						continue 
+					end
+
+					ClosestPlayer = Player
+					ShortestDistance = Magnitude
+					TargetPart = TargetPartTemp
 				end
-				ClosestPlayer = Player
-				ShortestDistance = Magnitude
 			end
 		end
 	end
-	fwSilent.Selected = (Chance and ClosestPlayer or LocalPlayer)
+	FwSilent.Selected = ClosestPlayer
+	FwSilent.SelectedPart = TargetPart
 end
 
-Heartbeat:Connect(function()
-	fwSilent.updateCircle()
-	fwSilent.getClosestPlayerToCursor()
+RunService.Heartbeat:Connect(function()
+	FwSilent.UpdateFOV()
+	FwSilent.GetClosestPlayerToCursor()
 end)
 
-return fwSilent
+return FwSilent
